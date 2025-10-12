@@ -3,19 +3,15 @@
 #include <string>
 #include <iomanip>
 #include <limits>
-
 using namespace std;
-
 class Student
 {
 private:
     string name;
     int id;
     vector<double> grades;
-
 public:
     Student(string studentName, int studentId) : name(studentName), id(studentId) {}
-
     void addGrade(double grade)
     {
         if (grade >= 0 && grade <= 100) {
@@ -29,7 +25,6 @@ public:
     {
         if (grades.empty())
             return 0.0;
-
         double sum = 0.0;
         for (double grade : grades)
         {
@@ -37,7 +32,6 @@ public:
         }
         return sum / grades.size();
     }
-
     char getLetterGrade() const
     {
         double average = calculateAverage();
@@ -52,7 +46,6 @@ public:
         else
             return 'F';
     }
-
     void displayInfo() const
     {
         cout << "\n--- Student Information ---" << endl;
@@ -72,17 +65,14 @@ public:
             cout << "No grades entered" << endl;
         }
     }
-
     string getName() const { return name; }
     int getId() const { return id; }
     const vector<double>& getGrades() const { return grades; }
 };
-
 class GradeManager
 {
 private:
     vector<Student> students;
-
     bool isIdUnique(int id) const
     {
         for (const auto& student : students)
@@ -94,17 +84,14 @@ private:
         }
         return true;
     }
-
 public:
     void addStudent()
     {
         string name;
         int id;
-
         cout << "\nEnter student name: ";
         cin.ignore();
         getline(cin, name);
-
         while (true)
         {
             cout << "Enter student ID: ";
@@ -126,11 +113,9 @@ public:
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
         }
-
         students.push_back(Student(name, id));
         cout << "Student added successfully!" << endl;
     }
-
     Student* findStudent(int id)
     {
         for (auto &student : students)
@@ -142,7 +127,6 @@ public:
         }
         return nullptr;
     }
-
     void addGradeToStudent()
     {
         if (students.empty())
@@ -150,7 +134,6 @@ public:
             cout << "No students available. Please add a student first." << endl;
             return;
         }
-
         int id;
         double grade;
 
@@ -162,7 +145,6 @@ public:
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             return;
         }
-
         Student *student = findStudent(id);
         if (student != nullptr)
         {
@@ -183,7 +165,6 @@ public:
             cout << "Student not found!" << endl;
         }
     }
-
     void displayAllStudents() const
     {
         if (students.empty())
@@ -191,14 +172,12 @@ public:
             cout << "No students to display." << endl;
             return;
         }
-
         cout << "\n=== ALL STUDENTS ===" << endl;
         for (const auto &student : students)
         {
             student.displayInfo();
         }
     }
-
     void displaySpecificStudent() const
     {
         if (students.empty())
@@ -206,7 +185,6 @@ public:
             cout << "No students available." << endl;
             return;
         }
-
         int id;
         cout << "Enter student ID: ";
         if (!(cin >> id))
@@ -216,7 +194,6 @@ public:
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             return;
         }
-
         bool found = false;
         for (const auto &student : students)
         {
@@ -227,13 +204,11 @@ public:
                 break;
             }
         }
-
         if (!found)
         {
             cout << "Student not found!" << endl;
         }
     }
-
     void displayClassStats() const
     {
         if (students.empty())
@@ -241,20 +216,17 @@ public:
             cout << "No students available for statistics." << endl;
             return;
         }
-
         double classAverage = 0.0;
         double highest = 0.0;
         double lowest = 100.0;
         int studentsWithGrades = 0;
         string topStudent, bottomStudent;
-
         for (const auto &student : students)
         {
             double avg = student.calculateAverage();
             if (!student.getGrades().empty()) {
                 classAverage += avg;
                 studentsWithGrades++;
-
                 if (avg > highest)
                 {
                     highest = avg;
@@ -268,10 +240,8 @@ public:
                 }
             }
         }
-
         if (studentsWithGrades > 0) {
             classAverage /= studentsWithGrades;
-
             cout << "\n=== CLASS STATISTICS ===" << endl;
             cout << "Class Average: " << fixed << setprecision(2) << classAverage << endl;
             cout << "Highest Average: " << highest << " (" << topStudent << ")" << endl;
@@ -282,7 +252,6 @@ public:
             cout << "No students have grades entered yet." << endl;
         }
     }
-
     void removeStudent()
     {
         if (students.empty())
@@ -290,7 +259,6 @@ public:
             cout << "No students to remove." << endl;
             return;
         }
-
         int id;
         cout << "Enter student ID to remove: ";
         if (!(cin >> id))
@@ -300,7 +268,6 @@ public:
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             return;
         }
-
         for (auto it = students.begin(); it != students.end(); ++it)
         {
             if (it->getId() == id)
@@ -314,14 +281,11 @@ public:
         cout << "Student not found!" << endl;
     }
 };
-
 int main()
 {
     GradeManager manager;
     int choice;
-
     cout << "=== STUDENT GRADE MANAGEMENT SYSTEM ===" << endl;
-
     do
     {
         cout << "\n=== MAIN MENU ===" << endl;
@@ -332,8 +296,7 @@ int main()
         cout << "5. Display Class Statistics" << endl;
         cout << "6. Remove Student" << endl;
         cout << "7. Exit" << endl;
-        cout << "Enter your choice (1-7): ";
-        
+        cout << "Enter your choice (1-7): ";    
         if (!(cin >> choice))
         {
             cout << "Invalid input! Please enter a number." << endl;
@@ -341,7 +304,6 @@ int main()
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
         }
-
         switch (choice)
         {
         case 1:
