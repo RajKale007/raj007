@@ -2,335 +2,165 @@
 #include <vector>
 #include <string>
 #include <iomanip>
-#include <limits>
 using namespace std;
-class Student
-{
-private:
+class Student {
     string name;
     int id;
     vector<double> grades;
 public:
-    Student(string studentName, int studentId) : name(studentName), id(studentId) {}
-    void addGrade(double grade)
-    {
-        if (grade >= 0 && grade <= 100) {
-            grades.push_back(grade);
-        } else {
-            cout << "Invalid grade! Grade must be between 0 and 100." << endl;
-        }
-    }
-
-    double calculateAverage() const
-    {
-        if (grades.empty())
-            return 0.0;
-        double sum = 0.0;
-        for (double grade : grades)
-        {
-            sum += grade;
-        }
+    Student(string n, int i) : name(n), id(i) {}  
+    void addGrade(double g) {
+        if (g >= 0 && g <= 100) grades.push_back(g);
+        else cout << "Invalid grade (0-100)!\n";
+    }   
+    double getAverage() const {
+        if (grades.empty()) return 0.0;
+        double sum = 0;
+        for (double g : grades) sum += g;
         return sum / grades.size();
-    }
-    char getLetterGrade() const
-    {
-        double average = calculateAverage();
-        if (average >= 90)
-            return 'A';
-        else if (average >= 80)
-            return 'B';
-        else if (average >= 70)
-            return 'C';
-        else if (average >= 60)
-            return 'D';
-        else
-            return 'F';
-    }
-    void displayInfo() const
-    {
-        cout << "\n--- Student Information ---" << endl;
-        cout << "Name: " << name << endl;
-        cout << "ID: " << id << endl;
-        cout << "Number of Grades: " << grades.size() << endl;
-        cout << "Grades: ";
-        for (double grade : grades)
-        {
-            cout << grade << " ";
-        }
-        if (!grades.empty()) {
-            cout << endl;
-            cout << "Average: " << fixed << setprecision(2) << calculateAverage() << endl;
-            cout << "Letter Grade: " << getLetterGrade() << endl;
-        } else {
-            cout << "No grades entered" << endl;
-        }
-    }
+    }  
+   char getLetterGrade() const {
+        double avg = getAverage();
+        if (avg >= 90) return 'A';
+        if (avg >= 80) return 'B';
+        if (avg >= 70) return 'C';
+        return avg >= 60 ? 'D' : 'F';
+    }  
+    void display() const {
+        cout << "\n--- Student Info ---\nName: " << name << "\nID: " << id 
+             << "\nGrades: ";
+        for (double g : grades) cout << g << " ";
+        if (grades.empty()) cout << "None";
+        else cout << "\nAverage: " << fixed << setprecision(2) << getAverage() 
+                  << "\nLetter: " << getLetterGrade();
+        cout << endl;
+    }    
     string getName() const { return name; }
     int getId() const { return id; }
-    const vector<double>& getGrades() const { return grades; }
+    bool hasGrades() const { return !grades.empty(); }
 };
-class GradeManager
-{
-private:
-    vector<Student> students;
-    bool isIdUnique(int id) const
-    {
-        for (const auto& student : students)
-        {
-            if (student.getId() == id)
-            {
-                return false;
-            }
-        }
+class GradeManager {
+    vector<Student> students;  
+    bool isUnique(int id) const {
+        for (auto& s : students) 
+            if (s.getId() == id) return false;
         return true;
-    }
-public:
-    void addStudent()
-    {
-        string name;
-        int id;
-        cout << "\nEnter student name: ";
-        cin.ignore();
-        getline(cin, name);
-        while (true)
-        {
-            cout << "Enter student ID: ";
-            if (cin >> id)
-            {
-                if (isIdUnique(id))
-                {
-                    break;
-                }
-                else
-                {
-                    cout << "ID already exists! Please enter a unique ID." << endl;
-                }
-            }
-            else
-            {
-                cout << "Invalid input! Please enter a numeric ID." << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-        }
-        students.push_back(Student(name, id));
-        cout << "Student added successfully!" << endl;
-    }
-    Student* findStudent(int id)
-    {
-        for (auto &student : students)
-        {
-            if (student.getId() == id)
-            {
-                return &student;
-            }
-        }
+    }  
+    Student* findStudent(int id) {
+        for (auto& s : students) 
+            if (s.getId() == id) return &s;
         return nullptr;
     }
-    void addGradeToStudent()
-    {
-        if (students.empty())
-        {
-            cout << "No students available. Please add a student first." << endl;
+public:
+    void addStudent() {
+        string name;
+        int id;
+        cout << "Name: ";
+        cin.ignore();
+        getline(cin, name);
+        cout << "ID: ";
+        cin >> id;
+        if (!isUnique(id)) cout << "ID exists!\n";
+        else {
+            students.push_back(Student(name, id));
+            cout << "Student added!\n";
+        }
+    }
+     void addGrade() {
+        if (students.empty()) {
+            cout << "No students!\n";
+            return;
+        }
+        int id; double grade;
+        cout << "Student ID: ";
+        cin >> id;
+        Student* s = findStudent(id);
+        if (!s) cout << "Not found!\n";
+        else {
+            cout << "Grade for " << s->getName() << ": ";
+            cin >> grade;
+            s->addGrade(grade);
+        }
+    }  
+    void showAll() const {
+        if (students.empty()) cout << "No students!\n";
+        else for (auto& s : students) s.display();
+    }  
+    void showStudent() const {
+        if (students.empty()) {
+            cout << "No students!\n";
             return;
         }
         int id;
-        double grade;
-
-        cout << "Enter student ID: ";
-        if (!(cin >> id))
-        {
-            cout << "Invalid input!" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            return;
-        }
-        Student *student = findStudent(id);
-        if (student != nullptr)
-        {
-            cout << "Enter grade for " << student->getName() << " (0-100): ";
-            if (cin >> grade)
-            {
-                student->addGrade(grade);
-            }
-            else
-            {
-                cout << "Invalid grade input!" << endl;
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            }
-        }
-        else
-        {
-            cout << "Student not found!" << endl;
-        }
-    }
-    void displayAllStudents() const
-    {
-        if (students.empty())
-        {
-            cout << "No students to display." << endl;
-            return;
-        }
-        cout << "\n=== ALL STUDENTS ===" << endl;
-        for (const auto &student : students)
-        {
-            student.displayInfo();
-        }
-    }
-    void displaySpecificStudent() const
-    {
-        if (students.empty())
-        {
-            cout << "No students available." << endl;
-            return;
-        }
-        int id;
-        cout << "Enter student ID: ";
-        if (!(cin >> id))
-        {
-            cout << "Invalid input!" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            return;
-        }
-        bool found = false;
-        for (const auto &student : students)
-        {
-            if (student.getId() == id)
-            {
-                student.displayInfo();
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            cout << "Student not found!" << endl;
-        }
-    }
-    void displayClassStats() const
-    {
-        if (students.empty())
-        {
-            cout << "No students available for statistics." << endl;
-            return;
-        }
-        double classAverage = 0.0;
-        double highest = 0.0;
-        double lowest = 100.0;
-        int studentsWithGrades = 0;
-        string topStudent, bottomStudent;
-        for (const auto &student : students)
-        {
-            double avg = student.calculateAverage();
-            if (!student.getGrades().empty()) {
-                classAverage += avg;
-                studentsWithGrades++;
-                if (avg > highest)
-                {
-                    highest = avg;
-                    topStudent = student.getName();
-                }
-
-                if (avg < lowest)
-                {
-                    lowest = avg;
-                    bottomStudent = student.getName();
-                }
-            }
-        }
-        if (studentsWithGrades > 0) {
-            classAverage /= studentsWithGrades;
-            cout << "\n=== CLASS STATISTICS ===" << endl;
-            cout << "Class Average: " << fixed << setprecision(2) << classAverage << endl;
-            cout << "Highest Average: " << highest << " (" << topStudent << ")" << endl;
-            cout << "Lowest Average: " << lowest << " (" << bottomStudent << ")" << endl;
-            cout << "Total Students: " << students.size() << endl;
-            cout << "Students with Grades: " << studentsWithGrades << endl;
-        } else {
-            cout << "No students have grades entered yet." << endl;
-        }
-    }
-    void removeStudent()
-    {
-        if (students.empty())
-        {
-            cout << "No students to remove." << endl;
-            return;
-        }
-        int id;
-        cout << "Enter student ID to remove: ";
-        if (!(cin >> id))
-        {
-            cout << "Invalid input!" << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            return;
-        }
-        for (auto it = students.begin(); it != students.end(); ++it)
-        {
-            if (it->getId() == id)
-            {
-                cout << "Removing student: " << it->getName() << endl;
-                students.erase(it);
-                cout << "Student removed successfully!" << endl;
+        cout << "Student ID: ";
+        cin >> id;
+        for (auto& s : students) {
+            if (s.getId() == id) {
+                s.display();
                 return;
             }
         }
-        cout << "Student not found!" << endl;
+        cout << "Not found!\n";
+    }  
+    void showStats() const {
+        if (students.empty()) {
+            cout << "No students!\n";
+            return;
+        }
+        double total = 0, high = 0, low = 100;
+        string top, bottom;
+        int withGrades = 0;   
+        for (auto& s : students) {
+            if (s.hasGrades()) {
+                double avg = s.getAverage();
+                total += avg;
+                withGrades++;
+                if (avg > high) { high = avg; top = s.getName(); }
+                if (avg < low) { low = avg; bottom = s.getName(); }
+            }
+        }     
+        if (withGrades) {
+            cout << "\n=== Statistics ===\nAverage: " << fixed << setprecision(2) 
+                 << total/withGrades << "\nHighest: " << high << " (" << top << ")"
+                 << "\nLowest: " << low << " (" << bottom << ")\nTotal: " 
+                 << students.size() << "\nWith Grades: " << withGrades << endl;
+        } else cout << "No grades entered!\n";
+    }   
+    void removeStudent() {
+        if (students.empty()) {
+            cout << "No students!\n";
+            return;
+        }
+        int id;
+        cout << "ID to remove: ";
+        cin >> id;
+        for (auto it = students.begin(); it != students.end(); ++it) {
+            if (it->getId() == id) {
+                cout << "Removed " << it->getName() << endl;
+                students.erase(it);
+                return;
+            }
+        }
+        cout << "Not found!\n";
     }
 };
-int main()
-{
-    GradeManager manager;
-    int choice;
-    cout << "=== STUDENT GRADE MANAGEMENT SYSTEM ===" << endl;
-    do
-    {
-        cout << "\n=== MAIN MENU ===" << endl;
-        cout << "1. Add Student" << endl;
-        cout << "2. Add Grade to Student" << endl;
-        cout << "3. Display All Students" << endl;
-        cout << "4. Display Specific Student" << endl;
-        cout << "5. Display Class Statistics" << endl;
-        cout << "6. Remove Student" << endl;
-        cout << "7. Exit" << endl;
-        cout << "Enter your choice (1-7): ";    
-        if (!(cin >> choice))
-        {
-            cout << "Invalid input! Please enter a number." << endl;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
+int main() {
+    GradeManager gm;
+    int choice; 
+    do {
+        cout << "\n1. Add Student\n2. Add Grade\n3. Show All\n4. Find Student"
+             << "\n5. Statistics\n6. Remove Student\n7. Exit\nChoice: ";
+        cin >> choice;     
+        switch(choice) {
+            case 1: gm.addStudent(); break;
+            case 2: gm.addGrade(); break;
+            case 3: gm.showAll(); break;
+            case 4: gm.showStudent(); break;
+            case 5: gm.showStats(); break;
+            case 6: gm.removeStudent(); break;
+            case 7: cout << "Goodbye!\n"; break;
+            default: cout << "Invalid!\n";
         }
-        switch (choice)
-        {
-        case 1:
-            manager.addStudent();
-            break;
-        case 2:
-            manager.addGradeToStudent();
-            break;
-        case 3:
-            manager.displayAllStudents();
-            break;
-        case 4:
-            manager.displaySpecificStudent();
-            break;
-        case 5:
-            manager.displayClassStats();
-            break;
-        case 6:
-            manager.removeStudent();
-            break;
-        case 7:
-            cout << "Thank you for using the Grade Management System!" << endl;
-            break;
-        default:
-            cout << "Invalid choice! Please try again." << endl;
-        }
-    } while (choice != 7);
-
+    } while (choice != 7);    
     return 0;
 }
