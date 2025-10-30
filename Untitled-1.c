@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 void bubbleSort(int arr[], int n);
 void selectionSort(int arr[], int n);
@@ -185,4 +184,5 @@ int main() {
         }        
     } while(choice != 7);    
     return 0;
+
 }
